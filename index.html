@@ -1948,7 +1948,64 @@ function editStQty(labelId,el){
 function loadDemo(){
     return;
 }
-loadDemo();renderDash();renderTodayLbls();setTimeout(checkStorageSize,500);window.autoFb=autoFb;
+
+// Hàm khởi tạo cấu hình và lắng nghe dữ liệu từ Firebase trước khi cho phép ghi/render
+function initFirebaseSync() {
+    if (typeof fbDb === 'undefined' || !fbDb) {
+        // Nếu không có kết nối Firebase, chạy offline bình thường bằng local
+        renderDash(); renderTodayLbls();
+        return;
+    }
+    
+    try {
+        const path = (typeof getFbPath === 'function') ? getFbPath() : 'kho';
+        if (!path) return;
+        
+        // LẮNG NGHE DỮ LIỆU TỪ FIREBASE TRƯỚC (CHỈ CHẠY 1 LẦN KHI F5 TRANG)
+        fbDb.ref(path).once('value').then((snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                // Nếu Firebase có dữ liệu, đồng bộ về máy trước để tránh bị đè dữ liệu rỗng
+                if (data.catalog) localStorage.setItem('qr_catalog', JSON.stringify(data.catalog));
+                if (data.labels) localStorage.setItem('qr_labels', JSON.stringify(data.labels));
+                if (data.txns) localStorage.setItem('qr_txns', JSON.stringify(data.txns));
+                if (data.capacity) localStorage.setItem('qr_capacity', JSON.stringify(data.capacity));
+                if (data.sessions) localStorage.setItem('qr_sessions', JSON.stringify(data.sessions));
+            }
+            // Sau khi dữ liệu đã nạp an toàn vào máy, mới tiến hành render giao diện
+            renderDash();
+            renderTodayLbls();
+        }).catch((err) => {
+            console.error("Lỗi tải dữ liệu Firebase khi khởi động:", err);
+            renderDash(); renderTodayLbls();
+        });
+    } catch (e) {
+        console.error("Lỗi init Firebase:", e);
+        renderDash(); renderTodayLbls();
+    }
+}
+
+// Định nghĩa hàm autoFb để các hàm vận hành khác (Nhập, Xuất, Di chuyển) gọi khi có thay đổi thực tế
+function autoFb(){
+    if (typeof fbDb === 'undefined' || !fbDb) return;
+    try {
+        const path = (typeof getFbPath === 'function') ? getFbPath() : 'kho';
+        if (!path) return;
+        const data = {
+            catalog: localStorage.getItem('qr_catalog') ? JSON.parse(localStorage.getItem('qr_catalog')) : [],
+            labels: localStorage.getItem('qr_labels') ? JSON.parse(localStorage.getItem('qr_labels')) : [],
+            txns: localStorage.getItem('qr_txns') ? JSON.parse(localStorage.getItem('qr_txns')) : [],
+            capacity: localStorage.getItem('qr_capacity') ? JSON.parse(localStorage.getItem('qr_capacity')) : {},
+            sessions: localStorage.getItem('qr_sessions') ? JSON.parse(localStorage.getItem('qr_sessions')) : []
+        };
+        fbDb.ref(path).set(data);
+    } catch(e) {
+        console.error("Lỗi đẩy dữ liệu lên Firebase:", e);
+    }
+}
+
+// Chạy hàm đồng bộ an toàn và gán biến autoFb toàn cục
+loadDemo(); initFirebaseSync(); setTimeout(checkStorageSize, 500); window.autoFb = autoFb;
 function autoFb(){
     if(typeof fbDb === 'undefined' || !fbDb) return;
     try {
