@@ -1948,7 +1948,7 @@ function editStQty(labelId,el){
 function loadDemo(){
     return;
 }
-
+loadDemo(); if(typeof fbDb !== 'undefined' && fbDb){ initFirebaseSync(); } else { renderDash(); renderTodayLbls(); } setTimeout(checkStorageSize, 500);
 // Hàm khởi tạo cấu hình và lắng nghe dữ liệu từ Firebase trước khi cho phép ghi/render
 function initFirebaseSync() {
     if (typeof fbDb === 'undefined' || !fbDb) {
