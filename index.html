@@ -133,20 +133,35 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
 .fb-box input{background:#2a2d33;border-color:#444;color:#e8eaed;font-size:11px;}
 .fb-box label{color:#aaa;}
 @media print {body > * { display: none !important; }
-  #print-area { display: block !important; }
-  /* Ép từng con tem khổ A5 hoặc khổ vuông tự động tách ra thành từng trang riêng khi in */
-  .ql-a5, .ql-sq { 
+  #print-area { 
+    display: block !important; 
+    float: none !important;
+    position: relative !important;
+  }
+  
+  /* Ép tất cả các khung chứa tem về dạng block khi in để kích hoạt ngắt trang */
+  #print-area, .preview-container, .row, .d-flex {
+    display: block !important;
+  }
+
+  /* Định dạng từng con tem tự động nhảy sang trang mới */
+  .ql-a5, .ql-sq, [class*="ql-"] { 
+    display: block !important;
     page-break-after: always !important; 
     page-break-inside: avoid !important;
+    float: none !important;
     margin-bottom: 0 !important;
+    margin-top: 0 !important;
   }
-  /* Xóa trang trắng thừa ở con tem cuối cùng */
-  .ql-a5:last-child, .ql-sq:last-child { 
+  
+  /* Bỏ ngắt trang ở con tem cuối cùng tránh bị thừa trang trắng */
+  .ql-a5:last-child, .ql-sq:last-child, [class*="ql-"]:last-child { 
     page-break-after: avoid !important; 
   }
+  
   @page { margin: 5mm; }
 }
-#print-area{display:none;}
+#print-area { display: none; }
 </style>
 </head>
 <body>
