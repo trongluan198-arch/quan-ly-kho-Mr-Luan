@@ -1946,10 +1946,7 @@ function editStQty(labelId,el){
 }
 
 function loadDemo(){
-    if(DB.gL().length > 0) return;
-    DB.sC([]); // Tạo khung Danh mục rỗng
-    DB.sL([]); // Tạo khung Tồn kho rỗng
-    DB.sT([]); // Tạo khung Lịch sử rỗng
+    return;
 }
 loadDemo();renderDash();renderTodayLbls();setTimeout(checkStorageSize,500);
 //================================================================================
