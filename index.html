@@ -1948,8 +1948,25 @@ function editStQty(labelId,el){
 function loadDemo(){
     return;
 }
-loadDemo();renderDash();renderTodayLbls();setTimeout(checkStorageSize,500);
-//================================================================================
+loadDemo();renderDash();renderTodayLbls();setTimeout(checkStorageSize,500);window.autoFb=autoFb;
+function autoFb(){
+    if(typeof fbDb === 'undefined' || !fbDb) return;
+    try {
+        const path = getFbPath ? getFbPath() : 'kho';
+        if(!path) return;
+        const data = {
+            catalog: localStorage.getItem('qr_catalog') ? JSON.parse(localStorage.getItem('qr_catalog')) : [],
+            labels: localStorage.getItem('qr_labels') ? JSON.parse(localStorage.getItem('qr_labels')) : [],
+            txns: localStorage.getItem('qr_txns') ? JSON.parse(localStorage.getItem('qr_txns')) : [],
+            capacity: localStorage.getItem('qr_capacity') ? JSON.parse(localStorage.getItem('qr_capacity')) : {},
+            sessions: localStorage.getItem('qr_sessions') ? JSON.parse(localStorage.getItem('qr_sessions')) : []
+        };
+        fbDb.ref(path).set(data);
+    } catch(e) {
+        console.error("Lỗi đồng bộ Firebase:", e);
+    }
+}
+  //================================================================================
 // RE-DESIGNED KIỂM KÊ KHO (STOCKTAKE MODULE) LOGIC ENGINE
 //================================================================================
 function initStocktakePage() {
